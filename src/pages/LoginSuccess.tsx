@@ -1,0 +1,18 @@
+import React from 'react';
+import { useSelector } from 'react-redux';
+
+const LoginSuccess = () => {
+	const { loggedInUser } = useSelector((state) => state.user);
+
+	return (
+		<div className='flex flex-col items-center pt-8 h-screen'>
+			<h2 className='text-2xl font-semibold mb-9'>Login Successful</h2>
+
+			<p>
+				<strong>Welcome !</strong> {loggedInUser.email}
+			</p>
+		</div>
+	);
+};
+
+export default LoginSuccess;
