@@ -12,7 +12,7 @@ export interface ChatState {
 }
 
 const initialState: ChatState = {
-	messages: JSON.parse(localStorage.getItem('Chats')) || [],
+	messages: JSON.parse(localStorage.getItem('Chats')!) || [],
 };
 
 export const chatSlice = createSlice({

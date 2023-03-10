@@ -4,20 +4,29 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { updateUser, resetUser } from '../features/user/userSlice';
 import FormInput from '../components/FormInput';
 import checkEmail from '../utils/checkEmail';
+import { RootState } from '../app/store';
+
+interface User {
+	id: number;
+	fullName: string;
+	email: string;
+	password: string;
+}
 
 const EditUser = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	let { id: userId } = useParams();
 
-	const { users, isSuccess, loggedInUser } = useSelector(
-		(state) => state.user
+	const users = useSelector<RootState, User[]>((state) => state.user.users);
+	const isSuccess = useSelector<RootState, boolean>(
+		(state) => state.user.isSuccess
 	);
 
-	const userToEdit = users.find(({ id }) => id === +userId);
+	const userToEdit = users.find(({ id }: { id: number }) => id === +userId!);
 
-	const [fullName, setFullName] = useState(userToEdit.fullName);
-	const [email, setEmail] = useState(userToEdit.email);
+	const [fullName, setFullName] = useState(userToEdit!.fullName);
+	const [email, setEmail] = useState(userToEdit!.email);
 	const [fullNameError, setFullNameError] = useState('');
 	const [emailError, setEmailError] = useState('');
 
@@ -33,9 +42,9 @@ const EditUser = () => {
 		let isValidEmail = checkEmail(email);
 
 		const filterEmails = users.filter(
-			(user) => user.email !== userToEdit.email
+			(user: User) => user.email !== userToEdit!.email
 		);
-		const takenEmails = filterEmails.map((u) => u.email);
+		const takenEmails = filterEmails.map((u: User) => u.email);
 		const isEmailTaken = takenEmails.includes(email);
 
 		if (!email || !email.trim()) {
@@ -56,7 +65,7 @@ const EditUser = () => {
 				fullName,
 				email,
 			};
-			dispatch(updateUser({ id: userId, fullName, email }));
+			dispatch(updateUser({ id: +userId!, fullName, email }));
 		}
 	};
 

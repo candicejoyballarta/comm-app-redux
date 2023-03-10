@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { uploadDocument } from '../features/document/documentSlice';
@@ -27,18 +27,17 @@ const UploadModal: React.FC<UploadModalProps> = ({
 		labelErr: '',
 		fileErr: '',
 	});
-	const fileInputRef = useRef();
 
 	const { label, fileName } = formData;
 	const { labelErr, fileErr } = formErr;
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files?.[0];
+		if (!e.target.files) return;
 		if (e.target.name === 'fileName') {
-			if (event.target.files.length > 0) {
+			if (e.target.files.length > 0) {
 				setFormData({
 					...formData,
-					[e.target.name]: file.name,
+					[e.target.name]: e.target.files[0].name,
 				});
 			} else {
 				setFormData({
@@ -154,7 +153,6 @@ const UploadModal: React.FC<UploadModalProps> = ({
 									id='fileName'
 									onChange={handleChange}
 									onBlur={validateFile}
-									ref={fileInputRef}
 								/>
 							</div>
 							{fileErr ? (

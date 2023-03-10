@@ -3,23 +3,44 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { shareDocument, removeShare } from '../features/document/documentSlice';
 import DeleteModal from '../components/DeleteModal';
+import { RootState } from '../app/store';
+
+interface Document {
+	fileId: number;
+	fileName: string;
+	label: string;
+	userId: number;
+	sharedIds: number[];
+}
+
+interface User {
+	id: number;
+	fullName: string;
+	email: string;
+	password: string;
+}
 
 const Share = () => {
 	const dispatch = useDispatch();
 	let { id } = useParams();
 	const [showModal, setShowModal] = useState(false);
 
-	const { documents } = useSelector((state) => state.document);
-	const { users, loggedInUser } = useSelector((state) => state.user);
+	const documents = useSelector<RootState, Document[]>(
+		(state) => state.document.documents
+	);
 
-	const fileToShare = documents.find(({ fileId }) => fileId === +id);
+	const users = useSelector<RootState, User[]>((state) => state.user.users);
+	const loggedInUser = useSelector<RootState, User>(
+		(state) => state.user.loggedInUser!
+	);
+
+	const fileToShare = documents.find(({ fileId }) => fileId === +id!);
 
 	const [selected, setSelected] = useState('');
-	const [shareId, setShareId] = useState('');
+	const [shareId, setShareId] = useState<number | null>(null);
 	const [selectedErr, setSelectedErr] = useState('');
 
-	const toggleModal = (id: number) => {
-		setShareId(id);
+	const toggleModal = () => {
 		setShowModal(!showModal);
 	};
 
@@ -55,7 +76,7 @@ const Share = () => {
 						Upload Sharing:{' '}
 					</h2>
 					<p className='text-2xl py-3 px-3 mb-3'>
-						{fileToShare.fileName}
+						{fileToShare?.fileName}
 					</p>
 				</div>
 				<div className='border-2 rounded border-black'>
@@ -71,8 +92,8 @@ const Share = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{fileToShare.sharedIds?.length > 0 ? (
-								fileToShare.sharedIds.map((userId, index) => {
+							{fileToShare!.sharedIds?.length > 0 ? (
+								fileToShare?.sharedIds.map((userId, index) => {
 									let userSharedTo = users.find(
 										({ id }) => id === userId
 									);
@@ -82,14 +103,15 @@ const Share = () => {
 											key={index}
 										>
 											<td className='table-cell text-left border-r-2 border-black px-2 py-1'>
-												{userSharedTo.fullName}
+												{userSharedTo?.fullName}
 											</td>
 											<td className='table-cell text-center border-black px-2 py-1'>
 												<button
 													onClick={() => {
-														toggleModal(
-															userSharedTo.id
+														setShareId(
+															userSharedTo?.id!
 														);
+														toggleModal();
 													}}
 												>
 													Remove
@@ -128,7 +150,7 @@ const Share = () => {
 										let option;
 										if (
 											user.id !== loggedInUser.id &&
-											!fileToShare.sharedIds?.includes(
+											!fileToShare!.sharedIds?.includes(
 												user.id
 											)
 										) {

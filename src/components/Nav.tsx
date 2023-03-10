@@ -1,11 +1,10 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate, NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
 import { logout } from '../features/user/userSlice';
 
 const Nav = () => {
 	const dispatch = useDispatch();
-	const navigate = useNavigate();
 
 	const logOutUser = () => {
 		dispatch(logout());

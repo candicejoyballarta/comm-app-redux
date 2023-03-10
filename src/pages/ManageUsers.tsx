@@ -5,18 +5,26 @@ import { deleteUserMessages } from '../features/chat/chatSlice';
 import { deleteUserDocument } from '../features/document/documentSlice';
 import { Link } from 'react-router-dom';
 import DeleteModal from '../components/DeleteModal';
+import { RootState } from '../app/store';
+
+interface User {
+	id: number;
+	fullName: string;
+	email: string;
+	password: string;
+}
 
 const ManageUsers = () => {
-	const [userId, setUserId] = useState('');
+	const [userId, setUserId] = useState<number | null>(null);
 	const [showModal, setShowModal] = useState(false);
 	const dispatch = useDispatch();
 
-	const { users, isSuccess, loggedInUser } = useSelector(
-		(state) => state.user
+	const users = useSelector<RootState, User[]>((state) => state.user.users);
+	const loggedInUser = useSelector<RootState, User>(
+		(state) => state.user.loggedInUser!
 	);
 
-	const toggleModal = (id: number) => {
-		setUserId(id);
+	const toggleModal = () => {
 		setShowModal(!showModal);
 	};
 
@@ -24,11 +32,11 @@ const ManageUsers = () => {
 		e.preventDefault();
 
 		// Delete user chat messages
-		dispatch(deleteUserMessages(userId));
+		dispatch(deleteUserMessages(userId!));
 		// Delete user documents & remove id to shares
-		dispatch(deleteUserDocument(userId));
+		dispatch(deleteUserDocument(userId!));
 		// Delete user and close modal
-		dispatch(deleteUser(userId));
+		dispatch(deleteUser(userId!));
 		setShowModal(!showModal);
 	};
 
@@ -74,7 +82,8 @@ const ManageUsers = () => {
 											|{' '}
 											<button
 												onClick={() => {
-													toggleModal(user.id);
+													setUserId(user.id);
+													toggleModal();
 												}}
 											>
 												Delete

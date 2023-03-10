@@ -5,6 +5,14 @@ import FormInput from '../components/FormInput';
 import { register, resetUser } from '../features/user/userSlice';
 import checkEmail from '../utils/checkEmail';
 import isObjectEmpty from '../utils/isObjectEmpty';
+import { RootState } from '../app/store';
+
+interface User {
+	id: number;
+	fullName: string;
+	email: string;
+	password: string;
+}
 
 function Register() {
 	const [formData, setFormData] = useState({
@@ -24,8 +32,12 @@ function Register() {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	const { users, isSuccess, loggedInUser } = useSelector(
-		(state) => state.user
+	const users = useSelector<RootState, User[]>((state) => state.user.users);
+	const isSuccess = useSelector<RootState, boolean>(
+		(state) => state.user.isSuccess
+	);
+	const loggedInUser = useSelector<RootState, User>(
+		(state) => state.user.loggedInUser!
 	);
 
 	const { fullName, email, password } = formData;

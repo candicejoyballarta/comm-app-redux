@@ -2,12 +2,23 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { resetUser } from '../features/user/userSlice';
+import { RootState } from '../app/store';
+
+interface User {
+	id: number;
+	fullName: string;
+	email: string;
+	password: string;
+}
 
 function Welcome() {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
-	const { users, isSuccess, loggedInUser } = useSelector(
-		(state) => state.user
+	const isSuccess = useSelector<RootState, boolean>(
+		(state) => state.user.isSuccess
+	);
+	const loggedInUser = useSelector<RootState, User>(
+		(state) => state.user.loggedInUser!
 	);
 
 	useEffect(() => {

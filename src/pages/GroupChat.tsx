@@ -2,6 +2,20 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { sendMessage } from '../features/chat/chatSlice';
+import { RootState } from '../app/store';
+
+interface Message {
+	dateTime: string;
+	userId: number;
+	message: string;
+}
+
+interface User {
+	id: number;
+	fullName: string;
+	email: string;
+	password: string;
+}
 
 const GroupChat = () => {
 	const [message, setMessage] = useState('');
@@ -9,11 +23,16 @@ const GroupChat = () => {
 
 	const dispatch = useDispatch();
 
-	const { messages } = useSelector((state) => state.chat);
-	const { users, loggedInUser } = useSelector((state) => state.user);
+	const messages = useSelector<RootState, Message[]>(
+		(state) => state.chat.messages
+	);
+	const users = useSelector<RootState, User[]>((state) => state.user.users);
+	const loggedInUser = useSelector<RootState, User>(
+		(state) => state.user.loggedInUser!
+	);
 
 	const validateMessage = () => {
-		if (!message | !message.trim()) {
+		if (!message || !message.trim()) {
 			setMsgError('Please input message');
 			return false;
 		} else {
@@ -73,7 +92,7 @@ const GroupChat = () => {
 					Group Chat
 				</span>
 				<span className='border-2 border-black rounded justify-center px-1 my-0.5'>
-					<FontAwesomeIcon icon='fa-solid fa-xmark' fontSize='20' />
+					<FontAwesomeIcon icon={['fas', 'xmark']} fontSize='20' />
 				</span>
 			</div>
 			<div
@@ -85,7 +104,7 @@ const GroupChat = () => {
 
 					return (
 						<p key={index}>
-							{chat.dateTime} {chatUser.fullName}: {chat.message}
+							{chat.dateTime} {chatUser!.fullName}: {chat.message}
 						</p>
 					);
 				})}
@@ -103,7 +122,7 @@ const GroupChat = () => {
 					<textarea
 						name='message'
 						className='border-2 border-black rounded w-full'
-						rows='1'
+						rows={1}
 						value={message}
 						onChange={(e) => setMessage(e.target.value)}
 						onBlur={validateMessage}
@@ -127,7 +146,7 @@ const GroupChat = () => {
 						type='button'
 						value='Refresh'
 						id='reset-btn'
-						onClick={() => window.location.reload(false)}
+						onClick={() => window.location.reload()}
 						className='border-2 border-black rounded-lg font-bold px-2'
 					/>
 				</div>

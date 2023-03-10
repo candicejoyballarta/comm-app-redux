@@ -14,7 +14,7 @@ export interface DocumentState {
 }
 
 const initialState: DocumentState = {
-	documents: JSON.parse(localStorage.getItem('Documents')) || [],
+	documents: JSON.parse(localStorage.getItem('Documents')!) || [],
 };
 
 export const documentSlice = createSlice({
@@ -42,20 +42,18 @@ export const documentSlice = createSlice({
 		},
 		shareDocument: (
 			state,
-			action: PayloadAction<{ id: number; selected: number }>
+			action: PayloadAction<{
+				id: number | string | undefined;
+				selected: number | string;
+			}>
 		) => {
 			const { id, selected } = action.payload;
 			const document = state.documents.find(
-				({ fileId }) => fileId === +id
+				({ fileId }) => fileId === +id!
 			);
-			const shares = document.sharedIds;
-			if (document !== -1) {
-				shares.push(+action.payload.selected);
-				localStorage.setItem(
-					'Documents',
-					JSON.stringify(state.documents)
-				);
-			}
+			const shares = document?.sharedIds;
+			shares?.push(+selected);
+			localStorage.setItem('Documents', JSON.stringify(state.documents));
 		},
 		deleteDocument: (state, action: PayloadAction<number>) => {
 			state.documents = state.documents.filter(
@@ -65,16 +63,19 @@ export const documentSlice = createSlice({
 		},
 		removeShare: (
 			state,
-			action: PayloadAction<{ id: number; shareId: number }>
+			action: PayloadAction<{
+				id: number | string | undefined;
+				shareId: number | null;
+			}>
 		) => {
 			const { id, shareId } = action.payload;
 
 			const document = state.documents.find(
-				({ fileId }) => fileId === +id
+				({ fileId }) => fileId === +id!
 			);
-			let itemIndex = document.sharedIds.indexOf(shareId);
-			if (itemIndex > -1) {
-				document.sharedIds.splice(itemIndex, 1);
+			let itemIndex = document?.sharedIds.indexOf(+shareId!);
+			if (itemIndex! > -1) {
+				document?.sharedIds.splice(itemIndex!, 1);
 			}
 			localStorage.setItem('Documents', JSON.stringify(state.documents));
 		},

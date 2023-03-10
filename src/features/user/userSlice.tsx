@@ -17,11 +17,11 @@ export interface UserState {
 }
 
 const initialState: UserState = {
-	users: JSON.parse(localStorage.getItem('Users')) || [],
+	users: JSON.parse(localStorage.getItem('Users')!) || [],
 	isSuccess: false,
 	isError: false,
 	message: '',
-	loggedInUser: JSON.parse(localStorage.getItem('loggedInUser')) || null,
+	loggedInUser: JSON.parse(localStorage.getItem('loggedInUser')!) || null,
 };
 
 export const userSlice = createSlice({
@@ -74,13 +74,13 @@ export const userSlice = createSlice({
 		) => {
 			const { id, fullName, email } = action.payload;
 			const user = state.users.find((user) => user.id === +id);
-			user.fullName = fullName;
-			user.email = email;
+			user!.fullName = fullName;
+			user!.email = email;
 			localStorage.setItem('Users', JSON.stringify(state.users));
 
-			if (state.loggedInUser.id === +id) {
-				state.loggedInUser.fullName = fullName;
-				state.loggedInUser.email = email;
+			if (state.loggedInUser!.id === +id) {
+				state.loggedInUser!.fullName = fullName;
+				state.loggedInUser!.email = email;
 			}
 			localStorage.setItem(
 				'loggedInUser',
@@ -96,12 +96,12 @@ export const userSlice = createSlice({
 			state.isSuccess = true;
 		},
 		resetUser: (state) => {
-			state.users = JSON.parse(localStorage.getItem('Users')) || [];
+			state.users = JSON.parse(localStorage.getItem('Users')!) || [];
 			state.isSuccess = false;
 			state.isError = false;
 			state.message = '';
 			state.loggedInUser =
-				JSON.parse(localStorage.getItem('loggedInUser')) || null;
+				JSON.parse(localStorage.getItem('loggedInUser')!) || null;
 		},
 	},
 });

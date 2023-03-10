@@ -6,7 +6,7 @@ interface DeleteModalProps {
 	title: string;
 	showModal: boolean;
 	toggleModal: () => void;
-	onDelete: () => void;
+	onDelete: (e: { preventDefault: () => void }) => void;
 }
 
 const DeleteModal: React.FC<DeleteModalProps> = ({

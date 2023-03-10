@@ -6,6 +6,14 @@ import FormInput from '../components/FormInput';
 import { login, resetUser } from '../features/user/userSlice';
 import checkEmail from '../utils/checkEmail';
 import isObjectEmpty from '../utils/isObjectEmpty';
+import { RootState } from '../app/store';
+
+interface User {
+	id: number;
+	fullName: string;
+	email: string;
+	password: string;
+}
 
 function Login() {
 	const [formData, setFormData] = useState({
@@ -24,8 +32,17 @@ function Login() {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	const { users, isSuccess, isError, message, loggedInUser } = useSelector(
-		(state) => state.user
+	const isSuccess = useSelector<RootState, boolean>(
+		(state) => state.user.isSuccess
+	);
+	const isError = useSelector<RootState, boolean>(
+		(state) => state.user.isError
+	);
+	const message = useSelector<RootState, string>(
+		(state) => state.user.message
+	);
+	const loggedInUser = useSelector<RootState, User>(
+		(state) => state.user.loggedInUser!
 	);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

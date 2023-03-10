@@ -5,32 +5,50 @@ import { deleteDocument } from '../features/document/documentSlice';
 import DeleteModal from '../components/DeleteModal';
 import UploadModal from '../components/UploadModal';
 import EditModal from '../components/EditModal';
+import { RootState } from '../app/store';
+
+interface Document {
+	fileId: number;
+	fileName: string;
+	label: string;
+	userId: number;
+	sharedIds: number[];
+}
+
+interface User {
+	id: number;
+	fullName: string;
+	email: string;
+	password: string;
+}
 
 const ManageDocuments = () => {
-	const [fileId, setFileId] = useState(null);
-	const [initLabel, setInitLabel] = useState(null);
-	const [showModal, setShowModal] = useState(false);
-	const [showEditModal, setShowEditModal] = useState(false);
-	const [showUploadModal, setShowUploadModal] = useState(false);
+	const [fileId, setFileId] = useState<number | null>(null);
+	const [initLabel, setInitLabel] = useState<string | null>(null);
+	const [showModal, setShowModal] = useState<boolean>(false);
+	const [showEditModal, setShowEditModal] = useState<boolean>(false);
+	const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
 
 	const dispatch = useDispatch();
 
-	const { documents } = useSelector((state) => state.document);
+	const documents = useSelector<RootState, Document[]>(
+		(state) => state.document.documents
+	);
 
-	const { users, loggedInUser } = useSelector((state) => state.user);
+	const users = useSelector<RootState, User[]>((state) => state.user.users);
+	const loggedInUser = useSelector<RootState, User>(
+		(state) => state.user.loggedInUser!
+	);
 
 	const toggleUploadModal = () => {
 		setShowUploadModal(!showUploadModal);
 	};
 
-	const toggleEditModal = (id: number, label: string) => {
-		setFileId(id);
-		setInitLabel(label);
+	const toggleEditModal = () => {
 		setShowEditModal(!showEditModal);
 	};
 
-	const toggleModal = (id: number) => {
-		setFileId(id);
+	const toggleModal = () => {
 		setShowModal(!showModal);
 	};
 
@@ -38,7 +56,7 @@ const ManageDocuments = () => {
 
 	const handleDelete = (e: { preventDefault: () => void }) => {
 		e.preventDefault();
-		dispatch(deleteDocument(fileId));
+		dispatch(deleteDocument(fileId!));
 		setShowModal(!showModal);
 	};
 
@@ -80,10 +98,13 @@ const ManageDocuments = () => {
 												<td className='table-cell text-center px-2 py-1'>
 													<button
 														onClick={() => {
-															toggleEditModal(
-																file.fileId,
+															setFileId(
+																file.fileId
+															);
+															setInitLabel(
 																file.label
 															);
+															toggleEditModal();
 														}}
 													>
 														Edit
@@ -91,9 +112,10 @@ const ManageDocuments = () => {
 													|{' '}
 													<button
 														onClick={() => {
-															toggleModal(
+															setFileId(
 																file.fileId
 															);
+															toggleModal();
 														}}
 													>
 														Delete
@@ -156,7 +178,7 @@ const ManageDocuments = () => {
 													{file.fileName}
 												</td>
 												<td className='table-cell text-center px-2 py-1'>
-													{docsOwner.email}
+													{docsOwner?.email}
 												</td>
 											</tr>
 										);
@@ -196,7 +218,7 @@ const ManageDocuments = () => {
 			{initLabel && (
 				<EditModal
 					title='Edit'
-					fileId={fileId}
+					fileId={fileId!}
 					initialLabel={initLabel}
 					showModal={showEditModal}
 					toggleModal={toggleEditModal}
