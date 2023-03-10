@@ -32,8 +32,8 @@ const UploadModal: React.FC<UploadModalProps> = ({
 	const { labelErr, fileErr } = formErr;
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (!e.target.files) return;
 		if (e.target.name === 'fileName') {
+			if (!e.target.files) return;
 			if (e.target.files.length > 0) {
 				setFormData({
 					...formData,
